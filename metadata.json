@@ -1,0 +1,8 @@
+{
+  "name": "Pocket Browser AI",
+  "description": "A feature-rich mini browser with built-in AI tools, calculator, and developer utilities.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
