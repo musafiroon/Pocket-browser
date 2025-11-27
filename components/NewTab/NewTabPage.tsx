@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Trash2, Edit2, Terminal, Calculator, Bot, TrendingUp, Music } from 'lucide-react';
+import { Search, Plus, Trash2, Edit2, Terminal, Calculator, Bot, TrendingUp, Music, Film } from 'lucide-react';
 import { Favorite, InternalApp } from '../../types';
 
 interface NewTabPageProps {
@@ -8,6 +9,7 @@ interface NewTabPageProps {
 
 const DEFAULT_FAVORITES: Favorite[] = [
     { id: 'ai', title: 'AI Chat', url: InternalApp.AI_CHAT, icon: 'AI_ICON', isDefault: true },
+    { id: 'movies', title: 'Movies', url: InternalApp.MOVIE_SEARCH, icon: 'MOVIE_ICON', isDefault: true },
     { id: 'songs', title: 'Songs', url: InternalApp.SONGS, icon: 'SONGS_ICON', isDefault: true },
     { id: 'utility', title: 'Text Utils', url: InternalApp.TEXT_UTILITY, icon: 'UTILITY_ICON', isDefault: true },
     { id: 'calc', title: 'Calculator', url: InternalApp.CALCULATOR, icon: 'CALC_ICON', isDefault: true },
@@ -31,7 +33,7 @@ const NewTabPage: React.FC<NewTabPageProps> = ({ onNavigate }) => {
                     ...f,
                     isDefault: DEFAULT_FAVORITES.some(df => df.id === f.id)
                 }));
-                // If new defaults were added (like Songs), we should verify they are in the list
+                // If new defaults were added (like Movies), we should verify they are in the list
                 const missingDefaults = DEFAULT_FAVORITES.filter(df => !hydrated.some((hf: Favorite) => hf.id === df.id));
                 setFavorites([...hydrated, ...missingDefaults]);
             } catch(e) {
@@ -86,7 +88,7 @@ const NewTabPage: React.FC<NewTabPageProps> = ({ onNavigate }) => {
             // Safety check
             if ((window as any).eruda) {
                 (window as any).eruda.init({
-                    tool: ['console', 'elements', 'network', 'info']
+                    tool: ['console', 'elements', 'info'] // Removed 'network' to prevent crash
                 });
                 (window as any).eruda.show();
                 console.log("Eruda initialized.");
@@ -98,6 +100,7 @@ const NewTabPage: React.FC<NewTabPageProps> = ({ onNavigate }) => {
     const renderIcon = (fav: Favorite) => {
         if (fav.icon === 'AI_ICON') return <Bot className="text-blue-400" size={24} />;
         if (fav.icon === 'SONGS_ICON') return <Music className="text-pink-400" size={24} />;
+        if (fav.icon === 'MOVIE_ICON') return <Film className="text-[#01b4e4]" size={24} />;
         if (fav.icon === 'UTILITY_ICON') return <TrendingUp className="text-emerald-400" size={24} />;
         if (fav.icon === 'CALC_ICON') return <Calculator className="text-purple-400" size={24} />;
         return <img src={fav.icon} alt={fav.title} className="w-6 h-6 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />;

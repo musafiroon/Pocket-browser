@@ -1,10 +1,12 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, RotateCcw, Plus, X, Minimize2, Calculator as CalcIcon, Bot, TrendingUp, Layout, Music, Globe, Settings2 } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Plus, X, Minimize2, Calculator as CalcIcon, Bot, TrendingUp, Layout, Music, Globe, Settings2, Film } from 'lucide-react';
 import { Tab, InternalApp, IframePermissions } from './types';
 import AiChat from './components/Apps/AiChat';
 import TextUtility from './components/Apps/TextUtility';
 import Calculator from './components/Apps/Calculator';
 import SongsApp from './components/Apps/SongsApp';
+import MovieSearchApp from './components/Apps/MovieSearchApp';
 import NewTabPage from './components/NewTab/NewTabPage';
 import CustomTabCreator from './components/NewTab/CustomTabCreator';
 
@@ -25,6 +27,7 @@ const App: React.FC = () => {
             else if (activeTab.url === InternalApp.CALCULATOR) setUrlInput('Calculator');
             else if (activeTab.url === InternalApp.AI_CHAT) setUrlInput('AI Chat');
             else if (activeTab.url === InternalApp.SONGS) setUrlInput('Spotify Connect');
+            else if (activeTab.url === InternalApp.MOVIE_SEARCH) setUrlInput('TMDB Movies');
             else if (activeTab.url === InternalApp.TEXT_UTILITY) setUrlInput('Text Utility');
             else setUrlInput(activeTab.url);
         }
@@ -86,6 +89,7 @@ const App: React.FC = () => {
         
         // Exact match commands for internal apps
         if (lower === 'music' || lower === 'songs') return InternalApp.SONGS;
+        if (lower === 'movies' || lower === 'tmdb' || lower === 'films') return InternalApp.MOVIE_SEARCH;
 
         if (url.startsWith('browser://')) return url;
 
@@ -106,6 +110,7 @@ const App: React.FC = () => {
         if (finalUrl === InternalApp.CALCULATOR) title = 'Calculator';
         else if (finalUrl === InternalApp.AI_CHAT) title = 'AI Assistant';
         else if (finalUrl === InternalApp.SONGS) title = 'Spotify Connect';
+        else if (finalUrl === InternalApp.MOVIE_SEARCH) title = 'TMDB Movies';
         else if (finalUrl === InternalApp.TEXT_UTILITY) title = 'Text Utils';
 
         setTabs(prev => prev.map(t => t.id === activeTabId ? { ...t, url: finalUrl, title, isNewTab: false } : t));
@@ -123,6 +128,7 @@ const App: React.FC = () => {
         if (tab.url === InternalApp.CALCULATOR) return <CalcIcon size={24} className="text-purple-400" />;
         if (tab.url === InternalApp.AI_CHAT) return <Bot size={24} className="text-blue-400" />;
         if (tab.url === InternalApp.SONGS) return <Music size={24} className="text-green-400" />;
+        if (tab.url === InternalApp.MOVIE_SEARCH) return <Film size={24} className="text-[#01b4e4]" />;
         if (tab.url === InternalApp.TEXT_UTILITY) return <TrendingUp size={24} className="text-emerald-400" />;
         if (tab.isNewTab) return <Layout size={24} className="text-gray-400" />;
         return <Globe size={24} className="text-gray-400" />;
@@ -238,6 +244,8 @@ const App: React.FC = () => {
                                 <AiChat />
                             ) : tab.url === InternalApp.SONGS ? (
                                 <SongsApp />
+                            ) : tab.url === InternalApp.MOVIE_SEARCH ? (
+                                <MovieSearchApp />
                             ) : tab.url === InternalApp.TEXT_UTILITY ? (
                                 <TextUtility />
                             ) : tab.isNewTab ? (

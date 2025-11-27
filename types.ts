@@ -56,7 +56,8 @@ export enum InternalApp {
     CALCULATOR = 'browser://calculator',
     AI_CHAT = 'browser://ai-chat',
     TEXT_UTILITY = 'browser://text-utility',
-    SONGS = 'browser://songs'
+    SONGS = 'browser://songs',
+    MOVIE_SEARCH = 'browser://movies'
 }
 
 // --- AI Types ---
@@ -150,4 +151,28 @@ export interface SpotifySearchResults {
     artists: SpotifyArtist[];
     playlists: SpotifyPlaylist[];
     tracks?: SpotifyTrack[]; // Optional if we re-enable later
+}
+
+// --- TMDB Types ---
+
+export interface TmdbItem {
+    id: number;
+    media_type?: 'movie' | 'tv' | 'person';
+    title?: string;
+    name?: string; // TV shows use 'name' instead of 'title'
+    poster_path?: string;
+    backdrop_path?: string;
+    overview?: string;
+    release_date?: string;
+    first_air_date?: string;
+    vote_average?: number;
+    genre_ids?: number[];
+    popularity?: number;
+}
+
+export interface TmdbResponse {
+    page: number;
+    results: TmdbItem[];
+    total_pages: number;
+    total_results: number;
 }
