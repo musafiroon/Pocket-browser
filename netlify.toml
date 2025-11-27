@@ -1,0 +1,10 @@
+[build]
+  functions = "netlify/functions"
+  # Directory if you're using a static client build (optional):
+  # publish = "dist"
+
+[[redirects]]
+  from = "/api/tmdb/*"
+  to = "/.netlify/functions/tmdb/:splat"
+  status = 200
+  force = true
