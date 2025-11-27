@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Music, Search, Settings, Heart, Play, X, Key, ImageOff, Disc, List, Loader2, AlertCircle, Mic2, Users, Maximize2, Minimize2, ChevronUp } from 'lucide-react';
 import { SpotifyConfig, SpotifyTrack, SpotifyPlaylist, SpotifyArtist, SpotifyImage } from '../../types';
@@ -39,7 +40,7 @@ const SongsApp: React.FC = () => {
     const [token, setToken] = useState<string>('');
     
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<{ artists: SpotifyArtist[], playlists: SpotifyPlaylist[] }>({ artists: [], playlists: [] });
+    const [searchResults, setSearchResults] = useState<{ artists: SpotifyArtist[], playlists: SpotifyPlaylist[], tracks: SpotifyTrack[] }>({ artists: [], playlists: [], tracks: [] });
     const [favorites, setFavorites] = useState<SpotifyTrack[]>([]);
     
     const [currentEmbedUrl, setCurrentEmbedUrl] = useState<string | null>(null);
@@ -111,7 +112,8 @@ const SongsApp: React.FC = () => {
             const results = await searchSpotify(searchQuery, activeToken);
             setSearchResults({
                 artists: results.artists || [],
-                playlists: results.playlists || []
+                playlists: results.playlists || [],
+                tracks: results.tracks || []
             });
         } catch (err: any) {
             if (err.message === '401') {
@@ -123,7 +125,8 @@ const SongsApp: React.FC = () => {
                         const results = await searchSpotify(searchQuery, newToken);
                         setSearchResults({
                             artists: results.artists || [],
-                            playlists: results.playlists || []
+                            playlists: results.playlists || [],
+                            tracks: results.tracks || []
                         });
                     } catch (retryErr: any) {
                         setError("Search failed after refresh. Please check API quotas.");
@@ -351,7 +354,7 @@ const SongsApp: React.FC = () => {
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && executeSearch()}
-                                    placeholder="Search artists or playlists..."
+                                    placeholder="Search artists, songs or playlists..."
                                     className="w-full bg-[#333] hover:bg-[#3a3a3a] focus:bg-[#333] text-white rounded-full py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-white/20 transition-all placeholder-gray-400 font-medium"
                                 />
                             </div>
@@ -376,6 +379,16 @@ const SongsApp: React.FC = () => {
                                         </section>
                                     )}
 
+                                    {/* Songs Section */}
+                                    {searchResults.tracks.length > 0 && (
+                                        <section>
+                                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><Disc size={20}/> Songs</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                {searchResults.tracks.map(renderTrackItem)}
+                                            </div>
+                                        </section>
+                                    )}
+
                                     {/* Playlists Section */}
                                     {searchResults.playlists.length > 0 && (
                                         <section>
@@ -387,15 +400,15 @@ const SongsApp: React.FC = () => {
                                     )}
 
                                     {/* Empty State */}
-                                    {!isLoading && searchResults.artists.length === 0 && searchResults.playlists.length === 0 && searchQuery && (
+                                    {!isLoading && searchResults.artists.length === 0 && searchResults.playlists.length === 0 && searchResults.tracks.length === 0 && searchQuery && (
                                         <div className="text-center text-gray-500 mt-20">
-                                            <p>No artists or playlists found for "{searchQuery}"</p>
+                                            <p>No results found for "{searchQuery}"</p>
                                         </div>
                                     )}
                                      {!isLoading && !searchQuery && (
                                         <div className="text-center text-gray-600 mt-20 flex flex-col items-center">
                                             <Music size={48} className="mb-4 opacity-50"/>
-                                            <p className="font-medium">Search for artists or playlists to play</p>
+                                            <p className="font-medium">Search for artists, songs or playlists</p>
                                         </div>
                                     )}
                                 </div>

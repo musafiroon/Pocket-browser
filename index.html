@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pocket Browser AI</title>
-    <!-- Switched to cdnjs static CSS as requested. -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" referrerpolicy="no-referrer" />
+    <!-- Tailwind CSS v4 Browser Script -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <style>
         /* Custom scrollbar hiding for app-like feel */
         .scrollbar-hide::-webkit-scrollbar {
@@ -25,10 +25,6 @@
         body {
             overscroll-behavior-y: none;
         }
-        /* Shim for critical JIT class used in App.tsx */
-        .h-\[100dvh\] {
-            height: 100vh;
-        }
     </style>
 <script type="importmap">
 {
@@ -44,5 +40,6 @@
 </head>
 <body class="bg-gray-900 text-white overflow-hidden select-none">
     <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>

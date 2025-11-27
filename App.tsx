@@ -83,7 +83,9 @@ const App: React.FC = () => {
         if (lower === 'calculator') return InternalApp.CALCULATOR;
         if (lower.includes('ai') && lower.includes('chat')) return InternalApp.AI_CHAT;
         if (lower.includes('utility')) return InternalApp.TEXT_UTILITY;
-        if (lower.includes('music') || lower.includes('songs') || lower.includes('spotify')) return InternalApp.SONGS;
+        
+        // Exact match commands for internal apps
+        if (lower === 'music' || lower === 'songs') return InternalApp.SONGS;
 
         if (url.startsWith('browser://')) return url;
 

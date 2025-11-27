@@ -35,10 +35,10 @@ export const getSpotifyToken = async (config: SpotifyConfig): Promise<string> =>
 };
 
 export const searchSpotify = async (query: string, token: string): Promise<SpotifySearchResults> => {
-    if (!query) return { artists: [], playlists: [] };
+    if (!query) return { artists: [], playlists: [], tracks: [] };
 
-    // Request artist and playlist types
-    const url = `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=artist,playlist&limit=12`;
+    // Request artist, playlist, and track types
+    const url = `${SEARCH_ENDPOINT}?q=${encodeURIComponent(query)}&type=artist,playlist,track&limit=12`;
     
     const response = await fetch(url, {
         headers: {
@@ -54,6 +54,7 @@ export const searchSpotify = async (query: string, token: string): Promise<Spoti
     const data = await response.json();
     return {
         artists: data.artists?.items || [],
-        playlists: data.playlists?.items || []
+        playlists: data.playlists?.items || [],
+        tracks: data.tracks?.items || []
     };
 };
