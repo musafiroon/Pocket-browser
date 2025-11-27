@@ -1,6 +1,4 @@
-const fetch = require('node-fetch'); // Standard in Netlify Node 18+ environments
-
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
   // 1. CORS Configuration
   const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
   const headers = {
