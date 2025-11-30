@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, RotateCcw, Plus, X, Minimize2, Calculator as CalcIcon, Bot, TrendingUp, Layout, Music, Globe, Settings2, Film } from 'lucide-react';
 import { Tab, InternalApp, IframePermissions } from './types';
@@ -24,24 +23,17 @@ const App: React.FC = () => {
 
     // --- Locking Mechanism ---
     useEffect(() => {
+        // Triggered when user switches tabs, minimizes, or phone screen turns off
         const handleVisibilityChange = () => {
-            if (document.hidden) {
+            if (document.visibilityState === 'hidden') {
                 setIsLocked(true);
             }
         };
 
-        const handleBlur = () => {
-             // Optional: Lock on window blur (switching windows/apps)
-             // Comment out if too aggressive
-             setIsLocked(true);
-        };
-
         document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('blur', handleBlur);
 
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('blur', handleBlur);
         };
     }, []);
 
