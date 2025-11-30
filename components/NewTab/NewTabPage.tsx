@@ -100,9 +100,7 @@ const NewTabPage: React.FC<NewTabPageProps> = ({ onNavigate }) => {
         script.src = "//cdn.jsdelivr.net/npm/eruda@3.0.1/eruda.min.js";
         script.onload = () => {
             if ((window as any).eruda) {
-                (window as any).eruda.init({
-                    tool: ['console', 'elements', 'info']
-                });
+                (window as any).eruda.init();
                 (window as any).eruda.show();
             }
         };
