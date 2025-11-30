@@ -1,7 +1,7 @@
 
 import { TmdbResponse } from "../types";
 
-const PROXY_BASE = "https://d1j3vi2u94ebt0.netlify.app/api/tmdb";
+const PROXY_BASE = (process.env.TMDB_BASE||'https://d1j3vi2u94ebt0.netlify.app')+"/api/tmdb";
 const IMG_BASE = "https://image.tmdb.org/t/p/w500";
 const BACKDROP_BASE = "https://image.tmdb.org/t/p/original";
 
