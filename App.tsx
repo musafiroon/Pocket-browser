@@ -9,8 +9,11 @@ import SongsApp from './components/Apps/SongsApp';
 import MovieSearchApp from './components/Apps/MovieSearchApp';
 import NewTabPage from './components/NewTab/NewTabPage';
 import CustomTabCreator from './components/NewTab/CustomTabCreator';
+import CamouflageScreen from './components/Camouflage/CamouflageScreen';
 
 const App: React.FC = () => {
+    // --- State ---
+    const [isLocked, setIsLocked] = useState(true); // Default to locked
     const [tabs, setTabs] = useState<Tab[]>([{ id: 1, title: 'New Tab', url: 'about:blank', isNewTab: true }]);
     const [activeTabId, setActiveTabId] = useState(1);
     const [urlInput, setUrlInput] = useState('');
@@ -19,7 +22,30 @@ const App: React.FC = () => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Sync input with active tab
+    // --- Locking Mechanism ---
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                setIsLocked(true);
+            }
+        };
+
+        const handleBlur = () => {
+             // Optional: Lock on window blur (switching windows/apps)
+             // Comment out if too aggressive
+             setIsLocked(true);
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('blur', handleBlur);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('blur', handleBlur);
+        };
+    }, []);
+
+    // --- Tab Logic ---
     useEffect(() => {
         const activeTab = tabs.find(t => t.id === activeTabId);
         if (activeTab) {
@@ -33,7 +59,6 @@ const App: React.FC = () => {
         }
     }, [activeTabId, tabs]);
 
-    // Fullscreen listener
     useEffect(() => {
         const handleFS = () => setIsFullscreen(!!document.fullscreenElement);
         document.addEventListener('fullscreenchange', handleFS);
@@ -69,7 +94,7 @@ const App: React.FC = () => {
         const remaining = tabs.filter(t => t.id !== id);
         if (remaining.length === 0) {
             setTabs([{ id: Date.now(), title: 'New Tab', url: 'about:blank', isNewTab: true }]);
-            setActiveTabId(tabs[0].id); // Re-target safe id
+            setActiveTabId(tabs[0].id);
         } else {
             setTabs(remaining);
             if (activeTabId === id) {
@@ -86,8 +111,6 @@ const App: React.FC = () => {
         if (lower === 'calculator') return InternalApp.CALCULATOR;
         if (lower.includes('ai') && lower.includes('chat')) return InternalApp.AI_CHAT;
         if (lower.includes('utility')) return InternalApp.TEXT_UTILITY;
-        
-        // Exact match commands for internal apps
         if (lower === 'music' || lower === 'songs') return InternalApp.SONGS;
         if (lower === 'movies' || lower === 'tmdb' || lower === 'films') return InternalApp.MOVIE_SEARCH;
 
@@ -134,9 +157,8 @@ const App: React.FC = () => {
         return <Globe size={24} className="text-gray-400" />;
     };
 
-    // Construct sandbox string
     const getSandboxAttr = (perms?: IframePermissions) => {
-        if (!perms) return "allow-same-origin allow-scripts allow-forms allow-popups allow-presentation"; // Default
+        if (!perms) return "allow-same-origin allow-scripts allow-forms allow-popups allow-presentation";
         const arr = [];
         if (perms.sandbox.allowSameOrigin) arr.push('allow-same-origin');
         if (perms.sandbox.allowScripts) arr.push('allow-scripts');
@@ -153,7 +175,6 @@ const App: React.FC = () => {
         return arr.join(' ');
     };
 
-    // Construct allow attr
     const getAllowAttr = (perms?: IframePermissions) => {
         if (!perms) return "fullscreen";
         const arr = [];
@@ -177,7 +198,11 @@ const App: React.FC = () => {
     };
 
     return (
-        <div ref={containerRef} className="flex h-[100dvh] w-full bg-gray-900 flex-col overflow-hidden font-sans">
+        <div ref={containerRef} className="flex h-[100dvh] w-full bg-gray-900 flex-col overflow-hidden font-sans relative">
+            
+            {/* Camouflage Overlay */}
+            {isLocked && <CamouflageScreen onUnlock={() => setIsLocked(false)} />}
+
             {/* Fullscreen Exit */}
             {isFullscreen && (
                 <button onClick={toggleFullscreen} className="absolute top-4 right-4 z-50 bg-gray-900/80 backdrop-blur text-white px-4 py-2 rounded-full border border-gray-700 hover:bg-gray-800 shadow-lg flex items-center gap-2">
@@ -234,8 +259,6 @@ const App: React.FC = () => {
                 {/* Render Tabs */}
                 {tabs.map(tab => {
                     const isActive = tab.id === activeTabId && !showTabSwitcher && !showCustomTabCreator;
-                    // Optimization: Only render active tab content to DOM (keeping state alive is handled by React if key persists, 
-                    // but using display:none ensures iframes don't reload when switching tabs)
                     return (
                         <div key={tab.id} className="w-full h-full bg-white absolute inset-0" style={{ display: isActive ? 'block' : 'none' }}>
                             {tab.url === InternalApp.CALCULATOR ? (
