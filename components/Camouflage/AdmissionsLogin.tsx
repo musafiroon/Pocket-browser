@@ -166,9 +166,6 @@ const AdmissionsLogin: React.FC<AdmissionsLoginProps> = ({ onUnlock }) => {
                                 </div>
 
                                 <div className="flex gap-4 items-center mb-8">
-                                    <div className="bg-[#0056a4] p-3 rounded flex items-center justify-center w-[120px]">
-                                        <span className="text-white font-bold text-[10px] leading-tight text-center">Brilliant<br/>NEET</span>
-                                    </div>
                                     <img src="/neet-scan.jpg.jpeg" alt="QR Code" className="w-[80px] h-auto" />
                                 </div>
 
