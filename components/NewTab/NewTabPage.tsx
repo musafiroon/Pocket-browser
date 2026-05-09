@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Trash2, Edit2, Terminal, Calculator, Bot, TrendingUp, Music, Film, X } from 'lucide-react';
+import { Search, Plus, Trash2, Edit2, Terminal, Calculator, TrendingUp, Film, X } from 'lucide-react';
 import { Favorite, InternalApp } from '../../types';
 
 interface NewTabPageProps {
@@ -7,10 +7,7 @@ interface NewTabPageProps {
 }
 
 const DEFAULT_FAVORITES: Favorite[] = [
-    { id: 'ai', title: 'AI Chat', url: InternalApp.AI_CHAT, icon: 'AI_ICON', isDefault: true },
     { id: 'movies', title: 'Movies', url: InternalApp.MOVIE_SEARCH, icon: 'MOVIE_ICON', isDefault: true },
-    { id: 'songs', title: 'Songs', url: InternalApp.SONGS, icon: 'SONGS_ICON', isDefault: true },
-    { id: 'utility', title: 'Text Utils', url: InternalApp.TEXT_UTILITY, icon: 'UTILITY_ICON', isDefault: true },
     { id: 'calc', title: 'Calculator', url: InternalApp.CALCULATOR, icon: 'CALC_ICON', isDefault: true },
     { id: 'wiki', title: 'Wikipedia', url: 'https://www.wikipedia.org', icon: 'https://en.wikipedia.org/static/favicon/wikipedia.ico', isDefault: true },
 ];
@@ -108,10 +105,7 @@ const NewTabPage: React.FC<NewTabPageProps> = ({ onNavigate }) => {
     };
 
     const renderIcon = (fav: Favorite) => {
-        if (fav.icon === 'AI_ICON') return <Bot className="text-blue-400" size={24} />;
-        if (fav.icon === 'SONGS_ICON') return <Music className="text-pink-400" size={24} />;
         if (fav.icon === 'MOVIE_ICON') return <Film className="text-[#01b4e4]" size={24} />;
-        if (fav.icon === 'UTILITY_ICON') return <TrendingUp className="text-emerald-400" size={24} />;
         if (fav.icon === 'CALC_ICON') return <Calculator className="text-purple-400" size={24} />;
         return <img src={fav.icon} alt={fav.title} className="w-6 h-6 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />;
     };

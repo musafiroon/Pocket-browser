@@ -1,18 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, RotateCcw, Plus, X, Minimize2, Calculator as CalcIcon, Bot, TrendingUp, Layout, Music, Globe, Settings2, Film } from 'lucide-react';
+import React, { useState, useRef, useEffect, Suspense, lazy } from 'react';
+import { ArrowLeft, RotateCcw, Plus, X, Minimize2, Calculator as CalcIcon, TrendingUp, Layout, Globe, Settings2, Film } from 'lucide-react';
 import { Tab, InternalApp, IframePermissions } from './types';
-import AiChat from './components/Apps/AiChat';
-import TextUtility from './components/Apps/TextUtility';
 import Calculator from './components/Apps/Calculator';
-import SongsApp from './components/Apps/SongsApp';
 import MovieSearchApp from './components/Apps/MovieSearchApp';
 import NewTabPage from './components/NewTab/NewTabPage';
 import CustomTabCreator from './components/NewTab/CustomTabCreator';
 import CamouflageScreen from './components/Camouflage/CamouflageScreen';
 
+// Lazy load the secondary camouflage
+const AdmissionsLogin = lazy(() => import('./components/Camouflage/AdmissionsLogin'));
+
 const App: React.FC = () => {
     // --- State ---
     const [isLocked, setIsLocked] = useState(true); // Default to locked
+    const [lockType, setLockType] = useState<'netlify' | 'admissions'>('netlify');
+    const [isInitialUnlockDone, setIsInitialUnlockDone] = useState(false);
     const [tabs, setTabs] = useState<Tab[]>([{ id: 1, title: 'New Tab', url: 'about:blank', isNewTab: true }]);
     const [activeTabId, setActiveTabId] = useState(1);
     const [urlInput, setUrlInput] = useState('');
@@ -27,6 +29,10 @@ const App: React.FC = () => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'hidden') {
                 setIsLocked(true);
+                // If we've already unlocked once, show the second camouflage
+                if (isInitialUnlockDone) {
+                    setLockType('admissions');
+                }
             }
         };
 
@@ -35,7 +41,14 @@ const App: React.FC = () => {
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
-    }, []);
+    }, [isInitialUnlockDone]);
+
+    const handleInitialUnlock = () => {
+        setIsLocked(false);
+        setIsInitialUnlockDone(true);
+        // Next lock will be Admissions
+        setLockType('admissions');
+    };
 
     // --- Tab Logic ---
     useEffect(() => {
@@ -43,10 +56,7 @@ const App: React.FC = () => {
         if (activeTab) {
             if (activeTab.isNewTab) setUrlInput('');
             else if (activeTab.url === InternalApp.CALCULATOR) setUrlInput('Calculator');
-            else if (activeTab.url === InternalApp.AI_CHAT) setUrlInput('AI Chat');
-            else if (activeTab.url === InternalApp.SONGS) setUrlInput('Spotify Connect');
             else if (activeTab.url === InternalApp.MOVIE_SEARCH) setUrlInput('TMDB Movies');
-            else if (activeTab.url === InternalApp.TEXT_UTILITY) setUrlInput('Text Utility');
             else setUrlInput(activeTab.url);
         }
     }, [activeTabId, tabs]);
@@ -101,9 +111,6 @@ const App: React.FC = () => {
         const lower = url.toLowerCase();
 
         if (lower === 'calculator') return InternalApp.CALCULATOR;
-        if (lower.includes('ai') && lower.includes('chat')) return InternalApp.AI_CHAT;
-        if (lower.includes('utility')) return InternalApp.TEXT_UTILITY;
-        if (lower === 'music' || lower === 'songs') return InternalApp.SONGS;
         if (lower === 'movies' || lower === 'tmdb' || lower === 'films') return InternalApp.MOVIE_SEARCH;
 
         if (url.startsWith('browser://')) return url;
@@ -123,10 +130,7 @@ const App: React.FC = () => {
 
         let title = customTitle || finalUrl;
         if (finalUrl === InternalApp.CALCULATOR) title = 'Calculator';
-        else if (finalUrl === InternalApp.AI_CHAT) title = 'AI Assistant';
-        else if (finalUrl === InternalApp.SONGS) title = 'Spotify Connect';
         else if (finalUrl === InternalApp.MOVIE_SEARCH) title = 'TMDB Movies';
-        else if (finalUrl === InternalApp.TEXT_UTILITY) title = 'Text Utils';
 
         setTabs(prev => prev.map(t => t.id === activeTabId ? { ...t, url: finalUrl, title, isNewTab: false } : t));
     };
@@ -141,10 +145,7 @@ const App: React.FC = () => {
 
     const getFavicon = (tab: Tab) => {
         if (tab.url === InternalApp.CALCULATOR) return <CalcIcon size={24} className="text-purple-400" />;
-        if (tab.url === InternalApp.AI_CHAT) return <Bot size={24} className="text-blue-400" />;
-        if (tab.url === InternalApp.SONGS) return <Music size={24} className="text-green-400" />;
         if (tab.url === InternalApp.MOVIE_SEARCH) return <Film size={24} className="text-[#01b4e4]" />;
-        if (tab.url === InternalApp.TEXT_UTILITY) return <TrendingUp size={24} className="text-emerald-400" />;
         if (tab.isNewTab) return <Layout size={24} className="text-gray-400" />;
         return <Globe size={24} className="text-gray-400" />;
     };
@@ -193,7 +194,15 @@ const App: React.FC = () => {
         <div ref={containerRef} className="flex h-[100dvh] w-full bg-gray-900 flex-col overflow-hidden font-sans relative">
             
             {/* Camouflage Overlay */}
-            {isLocked && <CamouflageScreen onUnlock={() => setIsLocked(false)} />}
+            {isLocked && (
+                lockType === 'netlify' ? (
+                    <CamouflageScreen onUnlock={handleInitialUnlock} />
+                ) : (
+                    <Suspense fallback={<div className="fixed inset-0 z-[9999] bg-white" />}>
+                        <AdmissionsLogin onUnlock={() => setIsLocked(false)} />
+                    </Suspense>
+                )
+            )}
 
             {/* Fullscreen Exit */}
             {isFullscreen && (
@@ -255,14 +264,8 @@ const App: React.FC = () => {
                         <div key={tab.id} className="w-full h-full bg-white absolute inset-0" style={{ display: isActive ? 'block' : 'none' }}>
                             {tab.url === InternalApp.CALCULATOR ? (
                                 <Calculator />
-                            ) : tab.url === InternalApp.AI_CHAT ? (
-                                <AiChat />
-                            ) : tab.url === InternalApp.SONGS ? (
-                                <SongsApp />
                             ) : tab.url === InternalApp.MOVIE_SEARCH ? (
                                 <MovieSearchApp />
-                            ) : tab.url === InternalApp.TEXT_UTILITY ? (
-                                <TextUtility />
                             ) : tab.isNewTab ? (
                                 <NewTabPage onNavigate={(url, title) => handleNavigate(url, title)} />
                             ) : (
